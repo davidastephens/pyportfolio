@@ -1,2 +1,2 @@
 # pyportfolio
-Library to manage portfolios of stocks and bonds.
+Library to manage portfolios of stocks and options.
