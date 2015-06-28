@@ -1,0 +1,3 @@
+account,amount,price,commission,currency_name,equity_ticker,security_type,underlying_security_type,underlying_equity_ticker,option_strike,option_type,option_expiry
+,100,120,7.99,USD,AAPL,Equity,,,,,
+,100,20,7.99,USD,,Option,Equity,AAPL,105,call,2016-06-30

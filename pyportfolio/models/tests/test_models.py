@@ -1,8 +1,8 @@
-from pyportfolio.models import Stock, Option, Future, Account, Trade, Commodity, Index, Currency, TradeList
+from pyportfolio.models import Equity, Option, Future, Account, Trade, Commodity, Index, Currency, TradeList
 from datetime import date
 import unittest
 
-AAPL = Stock(ticker='AAPL')
+AAPL = Equity(ticker='AAPL')
 AAPL_option = Option(underlying=AAPL, expiry=date(2016, 6, 30), strike=105, type='call')
 copper = Commodity(name='Copper')
 cu_future = Future(underlying=copper, expiry=date(2020, 6, 30))

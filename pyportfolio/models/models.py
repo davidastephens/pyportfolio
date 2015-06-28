@@ -1,15 +1,20 @@
 import csv
+from pyportfolio.utils.misc import get_required_args
+import pandas as pd
 
 fieldnames = [
+    'account',
     'amount',
     'price',
     'commission',
-    'currency',
-    'account',
-    'ticker',
+    'currency_name',
+    'equity_ticker',
     'security_type',
     'underlying_security_type',
-    'underlying_ticker',
+    'underlying_equity_ticker',
+    'option_strike',
+    'option_type',
+    'option_expiry',
     ]
 
 class Security(object):
@@ -19,8 +24,25 @@ class Security(object):
     def __eq__(self, other):
         return self._key == other._key
 
+    @classmethod
+    def from_dict(cls, d):
+        constructor = cls.factory(d['security_type'])
+        return constructor(**get_required_args(constructor.__init__, d))
 
-class Stock(Security):
+    @staticmethod
+    def factory(type):
+        if type == "Equity":
+            return Equity
+        elif type == "Option":
+            return Option
+        elif type == "Future":
+            return Future
+        elif type == "Index":
+            return Index
+        elif type == "Commodity":
+            return Commodity
+
+class Equity(Security):
     def __init__(self, ticker):
         self.ticker = ticker
 
@@ -30,14 +52,14 @@ class Stock(Security):
 
     def to_dict(self):
         d = {}
-        d['ticker'] = self.ticker
+        d['equity_ticker'] = self.ticker
         d['security_type'] = self.__class__.__name__
         return d
 
 class Option(Security):
     def __init__(self, underlying, expiry, strike, type):
         self.underlying = underlying
-        self.expiry = expiry
+        self.expiry = pd.to_datetime(expiry).date()
         self.strike = strike
         self.type = type
 
@@ -49,6 +71,9 @@ class Option(Security):
         d = {}
         d['security_type'] = self.__class__.__name__
         underlying_d = self.underlying.to_dict()
+        d['option_type'] = self.type
+        d['option_strike'] = self.strike
+        d['option_expiry'] = self.expiry
         for key in underlying_d:
             d['underlying_' + key] = underlying_d[key]
         return d
@@ -63,13 +88,11 @@ class Future(Security):
         return self.underlying == other.underlying & self.expiry == other.expiry
 
 
-class Index(object):
-    # TODO: Should this inherit from Security?
+class Index(Security):
     pass
 
 
-class Commodity(object):
-    # TODO: Should this inherit from Security?
+class Commodity(Security):
     def __init__(self, name):
         self.name = name
 
@@ -80,7 +103,7 @@ class Currency(object):
 
     def to_dict(self):
         d = {}
-        d['currency'] = self.name
+        d['currency_name'] = self.name
         return d
 
 
@@ -112,7 +135,7 @@ class Trade(object):
 
     @property
     def net_value(self):
-        "Amount of the trade, including com,issions"
+        "Amount of the trade, including commissions"
         return self.price * self.amount + self.commission
 
     def to_dict(self):
