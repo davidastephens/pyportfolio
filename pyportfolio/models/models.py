@@ -18,6 +18,7 @@ fieldnames = [
     ]
 
 class Security(object):
+
     def __hash__(self):
         return hash(self._key)
 

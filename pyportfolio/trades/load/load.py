@@ -4,13 +4,22 @@ from pyportfolio.models.models import Security
 from pyportfolio.utils.misc import get_required_args
 import pandas as pd
 
-def load_file(file_name):
+def load_csv(file_name):
+    df = pd.read_csv(file_name, parse_dates=True)
+    tl = trade_from_dataframe(df)
+    return tl
+
+def load_excel(file_name):
+    df = pd.read_excel(file_name, parse_dates=True)
+    tl = trade_from_dataframe(df)
+    return tl
+
+def trade_from_dataframe(df):
     tl = TradeList()
-    data = pd.read_csv(file_name, parse_dates=True)
-    data = data.convert_objects()
-    for index, d in data.iterrows():
-       d = d.to_dict()
-       tl.append(trade_from_dict(d))
+    df = df.convert_objects()
+    for index, d in df.iterrows():
+        d = d.to_dict()
+        tl.append(trade_from_dict(d))
     return tl
 
 def trade_from_dict(d):
